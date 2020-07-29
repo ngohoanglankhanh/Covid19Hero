@@ -7,7 +7,7 @@ const dotenv = require('dotenv');
 // Import required bot configuration.
 const ENV_FILE = path.join(__dirname, '.env');
 dotenv.config({ path: ENV_FILE });
-
+const {ProfileDialog} = require('./dialog/grocery_dialog');
 const restify = require('restify');
 
 // Import required bot services.
@@ -56,9 +56,17 @@ const onTurnErrorHandler = async (context, error) => {
 
 // Set the onTurnError for the singleton BotFrameworkAdapter.
 adapter.onTurnError = onTurnErrorHandler;
+const {UserState, ConversationState, MemoryStorage} = require('botbuilder')
+// Create the main dialog.
+const memoryStorage = new MemoryStorage();
+
+// Create conversation state with in-memory storage provider.
+const conversationState = new ConversationState(memoryStorage);
+const userState = new UserState(memoryStorage);
 
 // Create the main dialog.
-const myBot = new EchoBot();
+const dialog = new ProfileDialog(userState);
+const myBot = new EchoBot(conversationState, userState, dialog);
 
 // Listen for incoming requests.
 server.post('/api/messages', (req, res) => {

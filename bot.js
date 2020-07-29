@@ -17,18 +17,20 @@ class EchoBot extends ActivityHandler {
         });
 
         this.onMembersAdded(async (context, next) => {
-            const membersAdded = context.activity.membersAdded;
-            const welcomeText = 'Hello and welcome!';
-            for (let cnt = 0; cnt < membersAdded.length; ++cnt) {
-                if (membersAdded[cnt].id !== context.activity.recipient.id) {
-                    await context.sendActivity(MessageFactory.text(welcomeText, welcomeText));
+            for (const idx in context.activity.membersAdded) {
+                // Greet anyone that was not the target (recipient) of this message.
+                // Since the bot is the recipient for events from the channel,
+                // context.activity.membersAdded === context.activity.recipient.Id indicates the
+                // bot was added to the conversation, and the opposite indicates this is a user.
+                if (context.activity.membersAdded[idx].id !== context.activity.recipient.id) {
+                    await context.sendActivity('Welcome to the \'COVID-19-Hero\' Bot. Type Grocery to start ordering.');
                 }
             }
             // By calling next() you ensure that the next BotHandler is run.
             await next();
         });
     }
-    
+
     async run(context) {
         await super.run(context);
 
